@@ -1,17 +1,14 @@
 from __future__ import absolute_import, division, print_function
 
 import stripe
-from tests.helper import StripeTestCase
 
 
-class MySingleton(stripe.api_resources.abstract.SingletonAPIResource):
-    pass
+class TestSingletonAPIResource(object):
+    class MySingleton(stripe.api_resources.abstract.SingletonAPIResource):
+        pass
 
-
-class SingletonAPIResourceTests(StripeTestCase):
-
-    def test_retrieve(self):
-        self.stub_request(
+    def test_retrieve(self, request_mock):
+        request_mock.stub_request(
             'get',
             '/v1/mysingleton',
             {
@@ -19,11 +16,11 @@ class SingletonAPIResourceTests(StripeTestCase):
             }
         )
 
-        res = MySingleton.retrieve()
+        res = self.MySingleton.retrieve()
 
-        self.assert_requested(
+        request_mock.assert_requested(
             'get',
             '/v1/mysingleton',
             {}
         )
-        self.assertEqual('ton', res.single)
+        assert res.single == 'ton'
