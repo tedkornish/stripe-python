@@ -54,9 +54,10 @@ setup(
     install_requires=install_requires,
     setup_requires=['pytest-runner'],
     tests_require=[
-        'pytest >= 3.0',
+        'pytest == 3.2.5',  # last version still compatible with 2.6 & 3.3
         'pytest-mock',
         'mock;python_version<="3.3"',  # only necessary for Python 3.3
+        'pytest-cov',
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",

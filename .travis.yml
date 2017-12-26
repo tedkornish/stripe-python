@@ -50,7 +50,7 @@ install:
 
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then flake8 stripe tests; fi
-  - python -W all -bb -W error::BytesWarning -m coverage.__main__ run setup.py test
+  - python -W all -bb -W error::BytesWarning setup.py test --addopts "--cov=stripe"
 
 after_success:
   coveralls
