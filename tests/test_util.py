@@ -3,8 +3,6 @@ from __future__ import absolute_import, division, print_function
 import sys
 from collections import namedtuple
 
-import mock
-
 from stripe import util
 from stripe.six.moves import builtins
 
@@ -17,46 +15,37 @@ FmtTestCase = namedtuple('FmtTestCase', 'props expected')
 class TestUtil(object):
     DUMMY_REQ_ID = 'req_qsxPhqHyLxcoaM'
 
-    def test_test_apikey(self):
-        with mock.patch('stripe.api_key', 'sk_test_KOWobxXidxNlIx'):
-            link = util.dashboard_link(self.DUMMY_REQ_ID)
-            assert link == \
-                'https://dashboard.stripe.com/test/logs/' + self.DUMMY_REQ_ID
+    def test_test_apikey(self, mocker):
+        mocker.patch('stripe.api_key', 'sk_test_KOWobxXidxNlIx')
+        link = util.dashboard_link(self.DUMMY_REQ_ID)
+        assert link == \
+            'https://dashboard.stripe.com/test/logs/' + self.DUMMY_REQ_ID
 
-    def test_live_apikey(self):
-        with mock.patch('stripe.api_key', 'sk_live_axwITqZSgTUXSN'):
-            link = util.dashboard_link(self.DUMMY_REQ_ID)
-            assert link == \
-                'https://dashboard.stripe.com/live/logs/' + self.DUMMY_REQ_ID
+    def test_live_apikey(self, mocker):
+        mocker.patch('stripe.api_key', 'sk_live_axwITqZSgTUXSN')
+        link = util.dashboard_link(self.DUMMY_REQ_ID)
+        assert link == \
+            'https://dashboard.stripe.com/live/logs/' + self.DUMMY_REQ_ID
 
-    def test_no_apikey(self):
-        with mock.patch('stripe.api_key', None):
-            link = util.dashboard_link(self.DUMMY_REQ_ID)
-            assert link == \
-                'https://dashboard.stripe.com/test/logs/' + self.DUMMY_REQ_ID
+    def test_no_apikey(self, mocker):
+        mocker.patch('stripe.api_key', None)
+        link = util.dashboard_link(self.DUMMY_REQ_ID)
+        assert link == \
+            'https://dashboard.stripe.com/test/logs/' + self.DUMMY_REQ_ID
 
-    def test_old_apikey(self):
-        with mock.patch('stripe.api_key', 'axwITqZSgTUXSN'):
-            link = util.dashboard_link(self.DUMMY_REQ_ID)
-            assert link == \
-                'https://dashboard.stripe.com/test/logs/' + self.DUMMY_REQ_ID
+    def test_old_apikey(self, mocker):
+        mocker.patch('stripe.api_key', 'axwITqZSgTUXSN')
+        link = util.dashboard_link(self.DUMMY_REQ_ID)
+        assert link == \
+            'https://dashboard.stripe.com/test/logs/' + self.DUMMY_REQ_ID
 
-    def patch_val(self, var, value):
-        patcher = mock.patch(var, value)
-        patcher.start()
-
-    def patch_mock(self, var):
-        patcher = mock.patch(var)
-        mock_val = patcher.start()
-        return mock_val
-
-    def log_test_loop(self, test_cases, logging_func, logger_name):
+    def log_test_loop(self, test_cases, logging_func, logger_name, mocker):
         for case in test_cases:
             try:
-                logger_mock = self.patch_mock(logger_name)
-                print_mock = self.patch_mock(PRINT_FUNC_STRING)
-                self.patch_val('stripe.log', case.flag)
-                self.patch_val('stripe.util.STRIPE_LOG', case.env)
+                logger_mock = mocker.patch(logger_name)
+                print_mock = mocker.patch(PRINT_FUNC_STRING)
+                mocker.patch('stripe.log', case.flag)
+                mocker.patch('stripe.util.STRIPE_LOG', case.env)
 
                 logging_func('foo \nbar', y=3)  # function under test
 
@@ -70,9 +59,9 @@ class TestUtil(object):
                 logger_mock.assert_called_once_with(
                     "message='foo \\nbar' y=3")
             finally:
-                mock.patch.stopall()
+                mocker.stopall()
 
-    def test_log_debug(self):
+    def test_log_debug(self, mocker):
         # (STRIPE_LOG, stripe.log): should_output?
         test_cases = [
             LogTestCase(env=None, flag=None, should_output=False),
@@ -89,9 +78,10 @@ class TestUtil(object):
             test_cases,
             logging_func=util.log_debug,
             logger_name='stripe.util.logger.debug',
+            mocker=mocker
         )
 
-    def test_log_info(self):
+    def test_log_info(self, mocker):
         # (STRIPE_LOG, stripe.log): should_output?
         test_cases = [
             LogTestCase(env=None, flag=None, should_output=False),
@@ -108,6 +98,7 @@ class TestUtil(object):
             test_cases,
             logging_func=util.log_info,
             logger_name='stripe.util.logger.info',
+            mocker=mocker
         )
 
     def test_logfmt(self):

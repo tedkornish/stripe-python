@@ -53,8 +53,5 @@ def setup_stripe():
 
 
 @pytest.fixture
-def request_mock():
-    request_mock = RequestMock()
-    request_mock.start()
-    yield request_mock
-    request_mock.stop()
+def request_mock(mocker):
+    return RequestMock(mocker)

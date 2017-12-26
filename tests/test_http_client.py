@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function
 
 import pytest
-from mock import MagicMock, Mock, patch
 
 import stripe
 from stripe import six
@@ -13,19 +12,11 @@ class StripeClientTestCase(object):
     REQUEST_LIBRARIES = ['urlfetch', 'requests', 'pycurl', 'urllib.request']
 
     @pytest.fixture
-    def request_mocks(self):
-        request_patchers = {}
+    def request_mocks(self, mocker):
         request_mocks = {}
         for lib in self.REQUEST_LIBRARIES:
-            patcher = patch("stripe.http_client.%s" % (lib,))
-
-            request_mocks[lib] = patcher.start()
-            request_patchers[lib] = patcher
-
-        yield request_mocks
-
-        for patcher in six.itervalues(request_patchers):
-            patcher.stop()
+            request_mocks[lib] = mocker.patch("stripe.http_client.%s" % (lib,))
+        return request_mocks
 
 
 class TestNewDefaultHttpClient(StripeClientTestCase):
@@ -131,26 +122,26 @@ class TestRequestsClient(StripeClientTestCase, ClientTestBase):
     REQUEST_CLIENT = stripe.http_client.RequestsClient
 
     @pytest.fixture
-    def session(self, request_mocks):
-        return MagicMock()
+    def session(self, mocker, request_mocks):
+        return mocker.MagicMock()
 
     @pytest.fixture
-    def mock_response(self, session):
+    def mock_response(self, mocker, session):
         def mock_response(mock, body, code):
-            result = Mock()
+            result = mocker.Mock()
             result.content = body
             result.status_code = code
 
-            session.request = MagicMock(return_value=result)
-            mock.Session = MagicMock(return_value=session)
+            session.request = mocker.MagicMock(return_value=result)
+            mock.Session = mocker.MagicMock(return_value=session)
         return mock_response
 
     @pytest.fixture
-    def mock_error(self, session):
+    def mock_error(self, mocker, session):
         def mock_error(mock):
             mock.exceptions.RequestException = Exception
             session.request.side_effect = mock.exceptions.RequestException()
-            mock.Session = MagicMock(return_value=session)
+            mock.Session = mocker.MagicMock(return_value=session)
         return mock_error
 
     # Note that unlike other modules, we don't use the "mock" argument here
@@ -189,13 +180,13 @@ class TestUrlFetchClient(StripeClientTestCase, ClientTestBase):
     REQUEST_CLIENT = stripe.http_client.UrlFetchClient
 
     @pytest.fixture
-    def mock_response(self):
+    def mock_response(self, mocker):
         def mock_response(mock, body, code):
-            result = Mock()
+            result = mocker.Mock()
             result.content = body
             result.status_code = code
 
-            mock.fetch = Mock(return_value=result)
+            mock.fetch = mocker.Mock(return_value=result)
         return mock_response
 
     @pytest.fixture
@@ -229,25 +220,25 @@ class TestUrllib2Client(StripeClientTestCase, ClientTestBase):
         return self.client.request(method, url, headers, post_data)
 
     @pytest.fixture
-    def mock_response(self):
+    def mock_response(self, mocker):
         def mock_response(mock, body, code):
-            response = Mock
-            response.read = Mock(return_value=body)
+            response = mocker.Mock()
+            response.read = mocker.Mock(return_value=body)
             response.code = code
-            response.info = Mock(return_value={})
+            response.info = mocker.Mock(return_value={})
 
-            self.request_object = Mock()
-            mock.Request = Mock(return_value=self.request_object)
+            self.request_object = mocker.Mock()
+            mock.Request = mocker.Mock(return_value=self.request_object)
 
-            mock.urlopen = Mock(return_value=response)
+            mock.urlopen = mocker.Mock(return_value=response)
 
-            opener = Mock
-            opener.open = Mock(return_value=response)
-            mock.build_opener = Mock(return_value=opener)
+            opener = mocker.Mock()
+            opener.open = mocker.Mock(return_value=response)
+            mock.build_opener = mocker.Mock(return_value=opener)
             mock.build_opener.open = opener.open
-            mock.ProxyHandler = Mock(return_value=opener)
+            mock.ProxyHandler = mocker.Mock(return_value=opener)
 
-            mock.urlopen = Mock(return_value=response)
+            mock.urlopen = mocker.Mock(return_value=response)
         return mock_response
 
     @pytest.fixture
@@ -304,23 +295,22 @@ class TestPycurlClient(StripeClientTestCase, ClientTestBase):
         return self.client.request(method, url, headers, post_data)
 
     @pytest.fixture
-    def curl_mock(self):
-        return Mock()
+    def curl_mock(self, mocker):
+        return mocker.Mock()
 
     @pytest.fixture
-    def request_mock(self, request_mocks, curl_mock):
+    def request_mock(self, mocker, request_mocks, curl_mock):
         lib_mock = request_mocks[self.REQUEST_CLIENT.name]
-        lib_mock.Curl = Mock(return_value=curl_mock)
+        lib_mock.Curl = mocker.Mock(return_value=curl_mock)
         return curl_mock
 
     @pytest.fixture
-    def bio_getvalue(self):
-        bio_patcher = patch('stripe.util.io.BytesIO')
-        bio_mock = Mock()
-        bio_patcher.start().return_value = bio_mock
+    def bio_getvalue(self, mocker):
+        bio_patcher = mocker.patch('stripe.util.io.BytesIO')
+        bio_mock = mocker.Mock()
+        bio_patcher.return_value = bio_mock
         bio_getvalue = bio_mock.getvalue
-        yield bio_getvalue
-        bio_patcher.stop()
+        return bio_getvalue
 
     @pytest.fixture
     def mock_response(self, bio_getvalue):

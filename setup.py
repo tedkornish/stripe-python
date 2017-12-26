@@ -53,7 +53,11 @@ setup(
     package_data={'stripe': ['data/ca-certificates.crt']},
     install_requires=install_requires,
     setup_requires=['pytest-runner'],
-    tests_require=['pytest >= 3.0', 'mock'],
+    tests_require=[
+        'pytest >= 3.0',
+        'pytest-mock',
+        'mock;python_version<="3.3"',  # only necessary for Python 3.3
+    ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
