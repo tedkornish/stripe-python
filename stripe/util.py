@@ -31,31 +31,7 @@ except ImportError:
     # Python < 2.6
     from cgi import parse_qsl
 
-try:
-    import json
-except ImportError:
-    json = None
-
-if not (json and hasattr(json, 'loads')):
-    try:
-        import simplejson as json
-    except ImportError:
-        if not json:
-            raise ImportError(
-                "Stripe requires a JSON library, such as simplejson. "
-                "HINT: Try installing the "
-                "python simplejson library via 'pip install simplejson' or "
-                "'easy_install simplejson', or contact support@stripe.com "
-                "with questions.")
-        else:
-            raise ImportError(
-                "Stripe requires a JSON library with the same interface as "
-                "the Python 2.6 'json' library.  You appear to have a 'json' "
-                "library with a different interface.  Please install "
-                "the simplejson library.  HINT: Try installing the "
-                "python simplejson library via 'pip install simplejson' "
-                "or 'easy_install simplejson', or contact support@stripe.com"
-                "with questions.")
+import json  # noqa
 
 
 def utf8(value):

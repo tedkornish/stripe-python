@@ -32,13 +32,6 @@ with open('LONG_DESCRIPTION.rst') as f:
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'stripe'))
 from version import VERSION
 
-# Get simplejson if we don't already have json
-if sys.version_info < (3, 0):
-    try:
-        from util import json
-    except ImportError:
-        install_requires.append('simplejson')
-
 
 setup(
     name='stripe',
