@@ -48,10 +48,7 @@ else:
                 'library to the latest version.)' % (version,))
             requests = None
 
-try:
-    from google.appengine.api import urlfetch
-except ImportError:
-    urlfetch = None
+urlfetch = None
 
 # proxy support for the pycurl client
 from stripe.six.moves.urllib.parse import urlparse
