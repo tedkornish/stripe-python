@@ -11,47 +11,29 @@ except ImportError:
 path, script = os.path.split(sys.argv[0])
 os.chdir(os.path.abspath(path))
 
-install_requires = []
-
-if sys.version_info < (2, 6):
-    warnings.warn(
-        'Python 2.5 is no longer officially supported by Stripe. '
-        'If you have any questions, please file an issue on Github or '
-        'contact us at support@stripe.com.',
-        DeprecationWarning)
-    install_requires.append('requests >= 0.8.8, < 0.10.1')
-    install_requires.append('ssl')
-else:
-    install_requires.append('requests >= 0.8.8')
-
 
 with open('LONG_DESCRIPTION.rst') as f:
     long_description = f.read()
 
-# Don't import stripe module here, since deps may not be installed
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'stripe'))
-from version import VERSION
-
-# Get simplejson if we don't already have json
-if sys.version_info < (3, 0):
-    try:
-        from util import json
-    except ImportError:
-        install_requires.append('simplejson')
-
+version_contents = {}
+with open(os.path.join('stripe', 'version.py')) as f:
+    exec(f.read(), version_contents)
 
 setup(
     name='stripe',
-    version=VERSION,
-    description='Stripe python bindings',
+    version=version_contents['VERSION'],
+    description='Python bindings for the Stripe API',
     long_description=long_description,
     author='Stripe',
     author_email='support@stripe.com',
     url='https://github.com/stripe/stripe-python',
+    license='MIT',
     packages=['stripe', 'stripe.api_resources',
               'stripe.api_resources.abstract'],
     package_data={'stripe': ['data/ca-certificates.crt']},
-    install_requires=install_requires,
+    install_requires=[
+        'requests >= 0.8.8',
+    ],
     test_suite='tests',
     tests_require=['unittest2', 'mock'],
     classifiers=[

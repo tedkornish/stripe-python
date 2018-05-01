@@ -144,17 +144,21 @@ instructions for installing via Homebrew and other methods):
     go get -u github.com/stripe/stripe-mock
     stripe-mock
 
-  Run all tests (modify `-e` according to your Python target):
+Tests are managed by `tox`. Install using `pip`
+
+    pip install tox
+
+Run all tests (modify `-e` according to your Python target):
 
     tox -e py27
 
 Run a single test suite:
 
-    tox -e py27 -- --test-suite stripe.test.resources.test_updateable.UpdateableAPIResourceTests
+    tox -e py27 -- --test-suite tests.api_resources.abstract.test_updateable_api_resource.UpdateableAPIResourceTests
 
 Run a single test:
 
-    tox -e py27 -- --test-suite stripe.test.resources.test_updateable.UpdateableAPIResourceTests.test_save
+    tox -e py27 -- --test-suite tests.api_resources.abstract.test_updateable_api_resource.UpdateableAPIResourceTests.test_save
 
 Run the linter with:
 

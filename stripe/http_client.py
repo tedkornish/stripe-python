@@ -90,6 +90,10 @@ class HTTPClient(object):
         raise NotImplementedError(
             'HTTPClient subclasses must implement `request`')
 
+    def close(self):
+        raise NotImplementedError(
+            'HTTPClient subclasses must implement `close`')
+
 
 class RequestsClient(HTTPClient):
     name = 'requests'
@@ -157,6 +161,10 @@ class RequestsClient(HTTPClient):
         msg = textwrap.fill(msg) + "\n\n(Network error: %s)" % (err,)
         raise error.APIConnectionError(msg)
 
+    def close(self):
+        if self._session is not None:
+            self._session.close()
+
 
 class UrlFetchClient(HTTPClient):
     name = 'urlfetch'
@@ -214,6 +222,9 @@ class UrlFetchClient(HTTPClient):
 
         msg = textwrap.fill(msg) + "\n\n(Network error: " + str(e) + ")"
         raise error.APIConnectionError(msg)
+
+    def close(self):
+        pass
 
 
 class PycurlClient(HTTPClient):
@@ -334,6 +345,9 @@ class PycurlClient(HTTPClient):
                     return proxy[scheme]
         return None
 
+    def close(self):
+        pass
+
 
 class Urllib2Client(HTTPClient):
     name = 'urllib.request'
@@ -379,3 +393,6 @@ class Urllib2Client(HTTPClient):
                "If this problem persists, let us know at support@stripe.com.")
         msg = textwrap.fill(msg) + "\n\n(Network error: " + str(e) + ")"
         raise error.APIConnectionError(msg)
+
+    def close(self):
+        pass

@@ -89,12 +89,15 @@ class AccountTest(StripeTestCase):
 
     def test_is_deletable(self):
         resource = stripe.Account.retrieve(TEST_RESOURCE_ID)
+        # Unfortunately stripe-mock will return a resource with a different
+        # ID, so we need to store the original ID for the request assertion
+        resource_id = resource.id
         resource.delete()
         self.assert_requested(
             'delete',
-            '/v1/accounts/%s' % resource.id
+            '/v1/accounts/%s' % resource_id
         )
-        self.assertIsInstance(resource, stripe.Account)
+        self.assertTrue(resource.deleted)
 
     def test_can_retrieve_no_id(self):
         resource = stripe.Account.retrieve()
@@ -109,7 +112,7 @@ class AccountTest(StripeTestCase):
         resource = account.reject(reason='fraud')
         self.assert_requested(
             'post',
-            '/v1/accounts/%s/reject' % account.id
+            '/v1/accounts/%s/reject' % TEST_RESOURCE_ID
         )
         self.assertIsInstance(resource, stripe.Account)
         self.assertTrue(resource is account)
@@ -190,7 +193,7 @@ class AccountExternalAccountsTests(StripeTestCase):
             '/v1/accounts/%s/external_accounts/%s' % (TEST_RESOURCE_ID,
                                                       TEST_EXTERNALACCOUNT_ID)
         )
-        self.assertIsInstance(resource, stripe.BankAccount)
+        self.assertTrue(resource.deleted)
 
 
 class AccountLoginLinksTests(StripeTestCase):

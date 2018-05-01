@@ -59,10 +59,7 @@ if not (json and hasattr(json, 'loads')):
 
 
 def utf8(value):
-    # Note the ordering of these conditionals: `unicode` isn't a symbol in
-    # Python 3 so make sure to check version before trying to use it. Python
-    # 2to3 will also boil out `unicode`.
-    if six.PY2 and isinstance(value, unicode):
+    if six.PY2 and isinstance(value, six.text_type):
         return value.encode('utf-8')
     else:
         return value
@@ -219,7 +216,9 @@ def load_object_classes():
             api_resources.SubscriptionItem,
         api_resources.ThreeDSecure.OBJECT_NAME: api_resources.ThreeDSecure,
         api_resources.Token.OBJECT_NAME: api_resources.Token,
+        api_resources.Topup.OBJECT_NAME: api_resources.Topup,
         api_resources.Transfer.OBJECT_NAME: api_resources.Transfer,
+        api_resources.UsageRecord.OBJECT_NAME: api_resources.UsageRecord,
     }
 
 

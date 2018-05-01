@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.80.0 - 2018-04-24
+* [#421](https://github.com/stripe/stripe-python/pull/421) Add support for flexible billing and usage records
+
+## 1.79.1 - 2018-02-27
+* [#401](https://github.com/stripe/stripe-python/pull/401) Drop conditional dependencies that incorrectly led to an added `simplejson` dependency in Python 3+ after switching to universal wheel
+
+## 1.79.0 - 2018-02-23
+* [#397](https://github.com/stripe/stripe-python/pull/397) Build universal wheels by default
+* [#398](https://github.com/stripe/stripe-python/pull/398) Add support for `code` attribute on all Stripe exceptions
+
+## 1.78.0 - 2018-02-21
+* [#396](https://github.com/stripe/stripe-python/pull/396) Add support for topups
+
+## 1.77.2 - 2018-02-08
+* [#394](https://github.com/stripe/stripe-python/pull/394) Make `last_response` available after calling `save()`
+
 ## 1.77.1 - 2018-01-12
 * [#389](https://github.com/stripe/stripe-python/pull/389) Register unsaved attributes on assignment regardless of new value
 
